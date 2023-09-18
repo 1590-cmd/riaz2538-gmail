@@ -5,7 +5,7 @@
 # Algorithm from paper:
 
 #  Muhammad Riaz, M. H. Tahir, Mahmood ul Hassan
-#   H. M. Kashif Rasheed and Rashid Ahmed*
+#   H. M. Kashif Rasheed, Abid khan and Rashid Ahmed*
   
 #
 # Coded by Riaz et al., 2021-2022 
@@ -42,9 +42,9 @@ grouping1<-function(A,p,v,i){
   
   
   bs1<-t(apply(bs,1,sort))
-  bs1<-cbind(bs1,rowSums(bs),rowSums(bs)/v)
+  bs1<-cbind(bs1,rowSums(bs),rowSums(bs)/v,(i*v))
   rownames(bs1)<-paste("G",1:i, sep="")
-  colnames(bs1)<-c(paste(1:p, sep=""),"sum" ,"sum/v")
+  colnames(bs1)<-c(paste(1:p, sep=""),"sum" ,"sum/v","n")
   
   bs2<-t(apply(bs,1,sort))
   bs2<-delmin(bs2)
@@ -80,12 +80,10 @@ delmin<-function(z){
 
 # D=1: Minimal CBRMDs 
 # D=2: Minimal CSBRMDs 
-# D=3: Minimal CPBRMDs-I
-# D=4: Minimal CPBRMDs-II 
-# D=5: Minimal CWBRMDs-I
-# D=6: Minimal CSBGRMDs-I 
-# D=7: Minimal CSPBRMDs-I
-# D=8: Minimal CSPBRMDs-II 
+# D=3: Minimal CPBRMDs
+# D=4: Minimal CSPBRMDs
+# D=5: Minimal CWBRMDs
+# D=6: Minimal CSBGRMDs
 #   P: Period size
 #   i: Number of set of shifts for P
 
@@ -102,7 +100,7 @@ CGSBRMD_equalsize<-function(v,p,i,D=1){
     row <- paste(rep("=", 51), collapse = "")
     cat(row, "\n")
     cat("Following are required sets of shifts to obtain the 
-        minimal CBRMDs,CSBRMDs and  CWBRMDs for", "v=" ,object[[3]][1], "and","P=",object[[3]][2], "\n")
+minimal CBRMDs,CSBRMDs and  CWBRMDs for", "v=" ,object[[3]][1], ",","P=",object[[3]][2], "and", "n", "\n")
     row <- paste(rep("=", 51), collapse = "")
     cat(row, "\n")
     print(object$S[[1]])
