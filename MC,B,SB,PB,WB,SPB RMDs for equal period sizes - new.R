@@ -5,7 +5,7 @@
 # Algorithm from paper:
 
 #  Muhammad Riaz, M. H. Tahir, Mahmood ul Hassan
-#   H. M. Kashif Rasheed, Abid khan and Rashid Ahmed*
+#   H. M. Kashif Rasheed, Abid Khan and Rashid Ahmed*
   
 #
 # Coded by Riaz et al., 2021-2022 
@@ -86,7 +86,7 @@ delmin<-function(z){
 # D=6: Minimal CSBGRMDs
 #   P: Period size
 #   i: Number of set of shifts for P
-
+#   n: Number of units
 
 CGSBRMD_equalsize<-function(v,p,i,D=1){
   
@@ -99,8 +99,8 @@ CGSBRMD_equalsize<-function(v,p,i,D=1){
   setMethod("show", "stat_test", function(object) {
     row <- paste(rep("=", 51), collapse = "")
     cat(row, "\n")
-    cat("Following are required sets of shifts to obtain the 
-minimal CBRMDs,CSBRMDs and  CWBRMDs for", "v=" ,object[[3]][1], ",","P=",object[[3]][2], "and", "n", "\n")
+    cat("Following are required sets of shifts to obtain the minimal CBRMDs,CSBRMDs,
+CPBRMDs,CSPBRMDs,CWBRMDs and CBGRMDs for", "v=" ,object[[3]][1],"P=",object[[3]][2],"and","n=",(i*v),"\n")
     row <- paste(rep("=", 51), collapse = "")
     cat(row, "\n")
     print(object$S[[1]])
@@ -130,13 +130,13 @@ minimal CBRMDs,CSBRMDs and  CWBRMDs for", "v=" ,object[[3]][1], ",","P=",object[
       x<-list(S=A1$B1,G=A1$B2,R=A2,A=A)
      }
   
-    if(v%%2!=0 & D==4){
-      v=p*i+3
-      A<-c(1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
-      A1<-grouping1(A,p,v,i)
-      A2<-c(v,p);names(A2)<-c("V","P")
-      x<-list(S=A1$B1,G=A1$B2,R=A2,A=A)
-      }
+  if(v%%2==0 & D==4){
+    v=p*i+1
+    A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
+    A1<-grouping1(A,p,v,i)
+    A2<-c(v,p);names(A2)<-c("V","P")
+    x<-list(S=A1$B1,G=A1$B2,R=A2,A=A)
+  }
   
       if(v%%2==0 & D==5){  
       v=p*i
@@ -154,21 +154,6 @@ minimal CBRMDs,CSBRMDs and  CWBRMDs for", "v=" ,object[[3]][1], ",","P=",object[
     x<-list(S=A1$B1,G=A1$B2,R=A2,A=A)
   }
   
-  if(v%%2==0 & D==7){
-      v=p*i+1
-      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
-      A1<-grouping1(A,p,v,i)
-      A2<-c(v,p);names(A2)<-c("V","P")
-      x<-list(S=A1$B1,G=A1$B2,R=A2,A=A)
-    }
-    
-    if(v%%2!=0 & D==8){
-      v=p*i+2
-      A<-c(0,1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
-      A1<-grouping1(A,p,v,i)
-      A2<-c(v,p);names(A2)<-c("V","P")
-      x<-list(S=A1$B1,G=A1$B2,R=A2,A=A)
-      }
     
   
   new("stat_test", x)
@@ -244,12 +229,12 @@ design_CGSBRMD<-function(H){
 
 
 # example#1
-(H<-CGSBRMD_equalsize(v=11,p=7,i=2,D=1))
-
+(H<-CGSBRMD_equalsize(v=16,p=5,i=5,D=6))
+H$G
 (D<-design_CGSBRMD(H))
 
 # example #2
-(H<-CGSBRMD_equalsize(v=45,p=7,i=5,D=2))
+(H<-CGSBRMD_equalsize(v=13,p=4,i=3,D=1))
 H$G
 design_CGSBRMD(H)
 
