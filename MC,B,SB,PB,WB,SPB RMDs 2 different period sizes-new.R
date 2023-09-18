@@ -6,7 +6,7 @@
 # Algorithm from paper:
 
 #  Muhammad Riaz, Mahmood ul Hassan, M. H. Tahir, 
-# H.M. Kashif Rasheed and Rashid Ahmed*#
+# H.M. Kashif Rasheed, Abid khan and Rashid Ahmed*#
 # Coded by Riaz et al., 2021-2022 
 # Version 2.1.0  (2022-04-20)
 #################################################################################
@@ -75,14 +75,14 @@ grouping2<-function(A,p,v,i,sp2){
   
   
   gs1<-t(apply(s$B1,1,sort))
-  gs1<-cbind(gs1,rowSums(gs1),rowSums(gs1)/v)
+  gs1<-cbind(gs1,rowSums(gs1),rowSums(gs1)/v,(i+sp2)*v)
   rownames(gs1)<-paste("G",1:i, sep="")
-  colnames(gs1)<-c(paste(1:p[1], sep=""),"sum" ,"sum/v")
+  colnames(gs1)<-c(paste(1:p[1], sep=""),"sum" ,"sum/v","n")
   
   gs2<-t(apply(bs1,1,sort))
-  gs2<-cbind(gs2,rowSums(gs2),rowSums(gs2)/v)
+  gs2<-cbind(gs2,rowSums(gs2),rowSums(gs2)/v,(i+sp2)*v)
   rownames(gs2)<-paste("G",(nrow(gs1)+1):(nrow(gs1)+sp2), sep="")
-  colnames(gs2)<-c(paste(1:p[2], sep=""),"sum" ,"sum/v")
+  colnames(gs2)<-c(paste(1:p[2], sep=""),"sum" ,"sum/v","n")
   
   
   fs1<-t(apply(s$B1,1,sort))
@@ -122,16 +122,13 @@ delmin<-function(z){
 
 # D=1: Minimal CBRMDs 
 # D=2: Minimal CSBRMDs 
-# D=3: Minimal CPBRMDs-I
-# D=4: Minimal CPBRMDs-II 
-# D=5: Minimal CWBRMDs-I
-# D=6: Minimal CSBGRMDs-I 
-# D=7: Minimal CSPBRMDs-I
-# D=8: Minimal CSPBRMDs-II 
-#   p: Vector of three different period sizes 
+# D=3: Minimal CPBRMDs
+# D=4: Minimal CSPBRMDs 
+# D=5: Minimal CWBRMDs
+# D=6: Minimal CSBGRMDs
 #   i: Number of sets of shifts for p1
 # Sp2: Number of sets of shifts for p2
-
+#  n:  Number of units
 CGSBRMD_2diffsize<-function(v,p,i,D=1,sp2=1){
   
   if(length(p)>2 | length(p)<2){stop("Must be length(p)=2 ")}
@@ -142,9 +139,9 @@ CGSBRMD_2diffsize<-function(v,p,i,D=1,sp2=1){
   setMethod("show", "stat_test", function(object) {
     row <- paste(rep("=", 51), collapse = "")
     cat(row, "\n")
-    cat("Following are required sets of shifts to obtain the minimal CBRMDs,CSBRMDs 
-        and  CWBRMDs for", "v=" ,object$R[1], ",","p1=",object$R[2],
-        "and","p2=",object$R[3],"\n")
+    cat("Following are required sets of shifts to obtain the minimal CBRMDs,CSBRMDs,
+CPBRMDs,CSPBRMDs,CWBRMDs and  CSBGRMDs for", "v=" ,object$R[1], ",","p1=",object$R[2],
+ ",", "p2=",object$R[3],"and","n=",(i+sp2)*v," \n")
     row <- paste(rep("=", 51), collapse = "")
     cat(row, "\n")
     print(object$S[[1]])
@@ -176,9 +173,9 @@ CGSBRMD_2diffsize<-function(v,p,i,D=1,sp2=1){
         x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
       }
       
-      if(v%%2!=0 & D==4){
-        v=p[1]*i+p[2]+3
-        A<-c(1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
+      if(v%%2==0 & D==4){
+        v=p[1]*i+p[2]+1
+        A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
         A1<-c(grouping2(A,p,v,i,sp2))
         A2<-c(v,p);names(A2)<-c("V","p1","p2")
         x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
@@ -200,21 +197,6 @@ CGSBRMD_2diffsize<-function(v,p,i,D=1,sp2=1){
         x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
       }
       
-      if(v%%2==0 & D==7){
-        v=p[1]*i+p[2]+1
-        A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
-        A1<-c(grouping2(A,p,v,i,sp2))
-        A2<-c(v,p);names(A2)<-c("V","p1","p2")
-        x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
-      }
-      
-      if(v%%2!=0 & D==8){
-        v=p[1]*i+p[2]+2
-        A<-c(0,1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
-        A1<-c(grouping2(A,p,v,i,sp2))
-        A2<-c(v,p);names(A2)<-c("V","p1","p2")
-        x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
-      }
     }
     if(sp2==2){
       if(v%%2!=0 & D==1){ 
@@ -240,9 +222,9 @@ CGSBRMD_2diffsize<-function(v,p,i,D=1,sp2=1){
         x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
       }
       
-      if(v%%2!=0 & D==4){
-        v=p[1]*i+2*p[2]+3
-        A<-c(1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
+      if(v%%2==0 & D==4){
+        v=p[1]*i+2*p[2]+1
+        A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
         A1<-c(grouping2(A,p,v,i,sp2))
         A2<-c(v,p);names(A2)<-c("V","p1","p2")
         x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
@@ -259,22 +241,6 @@ CGSBRMD_2diffsize<-function(v,p,i,D=1,sp2=1){
       if(v%%2==0 & D==6){  
         v=p[1]*i+2*p[2]-1
         A<-c(0,1:(v-1),(v/2))
-        A1<-c(grouping2(A,p,v,i,sp2))
-        A2<-c(v,p);names(A2)<-c("V","p1","p2")
-        x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
-      }
-      
-      if(v%%2==0 & D==7){
-        v=p[1]*i+2*p[2]+1
-        A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
-        A1<-c(grouping2(A,p,v,i,sp2))
-        A2<-c(v,p);names(A2)<-c("V","p1","p2")
-        x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
-      }
-      
-      if(v%%2!=0 & D==8){
-        v=p[1]*i+2*p[2]+2
-        A<-c(0,1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
         A1<-c(grouping2(A,p,v,i,sp2))
         A2<-c(v,p);names(A2)<-c("V","p1","p2")
         x<-list(S=A1$B1,G=A1$B3,R=A2,A=A)
@@ -353,7 +319,8 @@ design_CGSBRMD<-function(H){
 # Examples for all cases D=1-case-1
 p=c(5,4);i=3;D=1;sp2=1
 (H<-CGSBRMD_2diffsize(p,i,D,sp2))
-(H<-CGSBRMD_2diffsize(p=c(5,4),v=11,i=2,D=4,sp2=2))
+(H<-CGSBRMD_2diffsize(p=c(4,5),v=15,i=1,D=1,sp2=2))
+H$G
 (H<-CGSBRMD_2diffsize(p=c(5,3),v=11,i=3,D=8,sp2=2))
 (design_CGSBRMD(H))
 
