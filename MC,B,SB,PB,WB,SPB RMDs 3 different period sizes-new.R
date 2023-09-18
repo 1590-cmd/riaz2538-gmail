@@ -6,7 +6,7 @@
 # Algorithm from paper:
 
 #  Muhammad Riaz, Mahmood ul Hassan, M. H. Tahir, 
-# H.M.Kashif Rasheed  and Rashid Ahmed#
+# H.M.Kashif Rasheed, Abid Khan  and Rashid Ahmed#
 # Coded by Riaz et al., 2021-2022 
 # Version 2.1.0  (2022-04-20)
 
@@ -111,20 +111,20 @@ grouping3<-function(A,p,v,i,sp2,sp3){
   }
   
   gs1<-t(apply(s$B1,1,sort))
-  gs1<-cbind(gs1,rowSums(gs1),rowSums(gs1)/v)
+  gs1<-cbind(gs1,rowSums(gs1),rowSums(gs1)/v,(i+sp2+sp3)*v)
   rownames(gs1)<-paste("G",1:i, sep="")
-  colnames(gs1)<-c(paste(1:p[1], sep=""),"sum" ,"sum/v")
+  colnames(gs1)<-c(paste(1:p[1], sep=""),"sum" ,"sum/v","n")
   
   gs2<-t(apply(s$B2,1,sort))
-  gs2<-cbind(gs2,rowSums(gs2),rowSums(gs2)/v)
+  gs2<-cbind(gs2,rowSums(gs2),rowSums(gs2)/v,(i+sp2+sp3)*v)
   rownames(gs2)<-paste("G",(i+1):(i+sp2), sep="")
-  colnames(gs2)<-c(paste(1:p[2], sep=""),"sum" ,"sum/v")
+  colnames(gs2)<-c(paste(1:p[2], sep=""),"sum" ,"sum/v","n")
   
   
   gs3<-t(apply(bs1,1,sort))
-  gs3<-cbind(gs3,rowSums(gs3),rowSums(gs3)/v)
+  gs3<-cbind(gs3,rowSums(gs3),rowSums(gs3)/v,(i+sp2+sp3)*v)
   rownames(gs3)<-paste("G",(i+sp2+1):(i+sp2+sp3), sep="")
-  colnames(gs3)<-c(paste(1:p[3], sep=""),"sum" ,"sum/v")
+  colnames(gs3)<-c(paste(1:p[3], sep=""),"sum" ,"sum/v","n")
   
   
   fs1<-t(apply(s$B1,1,sort))
@@ -169,17 +169,15 @@ delmin<-function(z){
 ##################################################################################
 # D=1: Minimal CBRMDs 
 # D=2: Minimal CSBRMDs 
-# D=3: Minimal CPBRMDs-I
-# D=4: Minimal CPBRMDs-II 
-# D=5: Minimal CWBRMDs-I
-# D=6: Minimal CSBGRMDs-I 
-# D=7: Minimal CSPBRMDs-I
-# D=8: Minimal CSPBRMDs-II 
+# D=3: Minimal CPBRMDs
+# D=4: Minimal CSPBRMDs 
+# D=5: Minimal CWBRMDs
+# D=6: Minimal CSBGRMDs
 #   p: Vector of three different period sizes 
 #   i: Number of sets of shifts for p1
 # Sp2: Number of sets of shifts for p2
 # Sp3: Number of sets of shifts for p3
-
+#   n: Number of units
 
 CGSBRMD_3diffsize<-function(v,p,i,D,sp2,sp3){
   if(length(p)>3 | length(p)<3){stop("Must be length(p)=3")}
@@ -192,9 +190,9 @@ CGSBRMD_3diffsize<-function(v,p,i,D,sp2,sp3){
   setMethod("show", "stat_test", function(object) {
     row <- paste(rep("=", 52), collapse = "")
     cat(row, "\n")
-    cat("Following are required sets of shifts to obtain the 
-minimal CBRMDs,CSBRMDs,CPBRMD-I,CPBRMD-II,CWBRMDs-I,
-CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],",","p2=",object$R[3],"and","p3=",object$R[4],"\n")
+    cat("Following are required sets of shifts to obtain the minimal CBRMDs,CSBRMDs,
+CPBRMD,CSPBRMD,CWBRMDs and CSBGRMD for", "v=" ,object$R[1], ",","p1=",object$R[2],",",
+    "p2=",object$R[3],",","p3=",object$R[4],"and","n=",(i+sp2+sp3)*v, "\n")
     row <- paste(rep("=", 52), collapse = "")
     cat(row, "\n")
     print(object$S[[1]])
@@ -232,9 +230,9 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
     }
   
-    if(v%%2!=0 & D==4){  
-      v=p[1]*i+p[2]+p[3]+3
-      A<-c(1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
+    if(v%%2==0 & D==4){  
+      v=p[1]*i+p[2]+p[3]+1
+      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
       A1<-grouping3(A,p,v,i,sp2,sp3)
       A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
@@ -256,21 +254,6 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
     }
     
-    if(v%%2==0 & D==7){  
-      v=p[1]*i+p[2]+p[3]+1
-      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
-    
-    if(v%%2!=0 & D==8){  
-      v=p[1]*i+p[2]+p[3]+2
-      A<-c(0,1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
   }
   if(sp2==2 & sp3==1){
     
@@ -298,9 +281,9 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
     }
     
-    if(v%%2!=0 & D==4){  
-      v=p[1]*i+2*p[2]+p[3]+3
-      A<-c(1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
+    if(v%%2==0 & D==4){  
+      v=p[1]*i+2*p[2]+p[3]+1
+      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
       A1<-grouping3(A,p,v,i,sp2,sp3)
       A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
@@ -322,21 +305,6 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
     }
     
-    if(v%%2==0 & D==7){  
-      v=p[1]*i+2*p[2]+p[3]+1
-      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
-    
-    if(v%%2!=0 & D==8){  
-      v=p[1]*i+2*p[2]+p[3]+2
-      A<-c(0,1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
   }  
   
   if(sp2==1 & sp3==2){
@@ -365,9 +333,9 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
     }
     
-    if(v%%2!=0 & D==4){  
-      v=p[1]*i+p[2]+2*p[3]+3
-      A<-c(1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
+    if(v%%2==0 & D==4){  
+      v=p[1]*i+p[2]+2*p[3]+1
+      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
       A1<-grouping3(A,p,v,i,sp2,sp3)
       A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
@@ -384,22 +352,6 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
     if(v%%2==0 & D==6){  
       v=p[1]*i+p[2]+2*p[3]-1
       A<-c(0,1:(v-1),(v/2))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
-    
-    if(v%%2==0 & D==7){  
-      v=p[1]*i+p[2]+2*p[3]+1
-      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
-    
-    if(v%%2!=0 & D==8){  
-      v=p[1]*i+p[2]+2*p[3]+2
-      A<-c(0,1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
       A1<-grouping3(A,p,v,i,sp2,sp3)
       A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
@@ -433,9 +385,9 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
     }
     
-    if(v%%2!=0 & D==4){  
-      v=p[1]*i+2*p[2]+2*p[3]+3
-      A<-c(1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
+    if(v%%2==0 & D==4){  
+      v=p[1]*i+2*p[2]+2*p[3]+1
+      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
       A1<-grouping3(A,p,v,i,sp2,sp3)
       A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
@@ -452,22 +404,6 @@ CSBGRMD,CSPBRMD-I AND CSPBRMD-I for", "v=" ,object$R[1], ",","p1=",object$R[2],"
     if(v%%2==0 & D==6){  
       v=p[1]*i+2*p[2]+2*p[3]-1
       A<-c(0,1:(v-1),(v/2))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
-    
-    if(v%%2==0 & D==7){  
-      v=p[1]*i+2*p[2]+2*p[3]+1
-      A<-c(0,1:((v-2)/2),((v+2)/2),((v+4)/2):(v-1))
-      A1<-grouping3(A,p,v,i,sp2,sp3)
-      A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
-      x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
-    }
-    
-    if(v%%2!=0 & D==8){  
-      v=p[1]*i+2*p[2]+2*p[3]+2
-      A<-c(0,1:((v-3)/2),((v+3)/2),((v+5)/2):(v-1))
       A1<-grouping3(A,p,v,i,sp2,sp3)
       A2<-c(v,p);names(A2)<-c("V","p1","p2","p3")
       x<-list(S=A1$B1,G=A1$B4,R=A2,A=A)
@@ -549,7 +485,8 @@ design_CGSBRMD<-function(H){
 # Examples for Case#1
 p=c(13,9,7);i=5;D=1;sp2=1;sp3=1
 (H<-CGSBRMD_3diffsize(p,i=5,D=1,sp2,sp3))
-(H<-CGSBRMD_3diffsize(p=c(3,4,5),v=5,i=3,D=8,sp2=2,sp3=2))
+(H<-CGSBRMD_3diffsize(p=c(3,4,5),v=13,i=1,D=1,sp2=1,sp3=1))
+H$G
 (H<-CGSBRMD_3diffsize(p=c(3,5,6),v=43,i=5,D=2,sp2=2,sp3=2))
 
 (H<-CGSBRMD_3diffsize(p=c(8,5,3),v=3,i=5,D=1,sp2=1,sp3=1))
