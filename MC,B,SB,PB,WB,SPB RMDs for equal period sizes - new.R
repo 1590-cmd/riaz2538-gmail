@@ -91,7 +91,7 @@ delmin<-function(z){
 CGSBRMD_equalsize<-function(v,p,i,D=1){
   
   if(p<=2) stop("P= Period size: Period size must be greater than 2")
-  if(i<=0) stop("i= Must be a positive integer")
+  if(i<=1) stop("i= Must be a positive integer")
   
   
   setClass( "stat_test", representation("list"))
